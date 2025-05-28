@@ -18,14 +18,30 @@
             text-align: left;
             border: 1px solid #ddd;
         }
-        .on-time {
-            background-color: #c8e6c9; /* Verde claro */
+        .finalizado {
+            background-color: skyblue;
+            color: black;
+            font-weight: normal;
         }
-        .delayed {
-            background-color: #ffccbc; /* Rojo claro */
+        .en-trayecto {
+            background-color: green;
+            color: white;
+            font-weight: bold;
         }
-        .boarding {
-            background-color: #fff9c4; /* Amarillo claro */
+        .por-iniciar-10 {
+            background-color: orange;
+            color: black;
+            font-weight: normal;
+        }
+        .por-iniciar-30 {
+            background-color: yellow;
+            color: black;
+            font-weight: normal;
+        }
+        .normal {
+            background-color: '';
+            color: black;
+            font-weight: normal;
         }
     </style>
 </head>
@@ -35,7 +51,8 @@
         <thead>
             <tr>
                 <th>Servicio</th>
-                <th>Horario</th>
+                <th>Hora Inicio</th>
+                <th>Hora Fin</th>
                 <th>Estado</th>
             </tr>
         </thead>
@@ -43,39 +60,54 @@
     </table>
 
     <script>
-        const sheetUrl = '169TxSPiBEbh8Dbx2lpWg2p2Ppyv-jPv3ewInbIb1YcA'; // Reemplaza esto con la URL de tu hoja
-        const servicesTableBody = document.querySelector('#servicesTable tbody');
+        const sheetUrl = '1wcFN7dBILdmjqxboW5FUcbLnklWHX2p9ZmTrpRjfQ48'; // Reemplaza esto con la URL de tu hoja
 
         function fetchData() {
             fetch(sheetUrl)
                 .then(response => response.text())
                 .then(data => {
                     const rows = data.split('\n');
+                    const servicesTableBody = document.querySelector('#servicesTable tbody');
                     servicesTableBody.innerHTML = '';
-                    const currentTime = new Date();
-                    rows.forEach(row => {
+                    const ahora = new Date();
+
+                    rows.forEach((row, index) => {
                         const cols = row.split(',');
-                        if (cols.length > 1) {
+                        if (cols.length > 2 && index > 0) { // Omitir encabezado
                             const serviceName = cols[0];
-                            const serviceTime = new Date(cols[1]);
-                            const status = getStatus(serviceTime, currentTime);
+                            const horaInicio = new Date(cols[13]); // Columna N (índice 13)
+                            const horaFin = new Date(cols[14]); // Columna O (índice 14)
+                            const estadoCelda = document.createElement('td');
+                            let estado = '';
+
+                            const diferenciaInicio = horaInicio - ahora;
+                            const diferenciaFin = horaFin - ahora;
+
+                            if (diferenciaFin <= 0 && diferenciaInicio <= 0) {
+                                estado = 'Finalizado';
+                                estadoCelda.className = 'finalizado';
+                            } else if (diferenciaInicio <= 0 && diferenciaFin > 0) {
+                                estado = 'En trayecto';
+                                estadoCelda.className = 'en-trayecto';
+                            } else if (diferenciaInicio <= 10 * 60 * 1000) {
+                                estado = 'Por iniciar';
+                                estadoCelda.className = 'por-iniciar-10';
+                            } else if (diferenciaInicio <= 30 * 60 * 1000) {
+                                estado = 'Por iniciar';
+                                estadoCelda.className = 'por-iniciar-30';
+                            } else {
+                                estado = '';
+                                estadoCelda.className = 'normal';
+                            }
+
                             const rowElement = document.createElement('tr');
-                            rowElement.className = status;
-                            rowElement.innerHTML = `<td>${serviceName}</td><td>${serviceTime.toLocaleTimeString()}</td><td>${status}</td>`;
+                            rowElement.innerHTML = `<td>${serviceName}</td><td>${horaInicio.toLocaleTimeString()}</td><td>${horaFin.toLocaleTimeString()}</td>`;
+                            estadoCelda.textContent = estado;
+                            rowElement.appendChild(estadoCelda);
                             servicesTableBody.appendChild(rowElement);
                         }
                     });
                 });
-        }
-
-        function getStatus(serviceTime, currentTime) {
-            if (serviceTime > currentTime) {
-                return 'on-time';
-            } else if (serviceTime <= currentTime && serviceTime >= new Date(currentTime - 30 * 60000)) {
-                return 'boarding';
-            } else {
-                return 'delayed';
-            }
         }
 
         setInterval(fetchData, 60000); // Actualiza cada minuto
