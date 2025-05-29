@@ -54,7 +54,7 @@
                     rows.forEach((row, index) => {
                         const cols = row.split(',');
                         if (cols.length > 2 && index > 0) {
-                            const serviceName = cols[0];
+                            const serviceName = cols[1];
                             const horaInicio = new Date(cols[13]);
                             const horaFin = new Date(cols[14]);
                             const estadoCelda = document.createElement('td');
