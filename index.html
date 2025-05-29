@@ -18,31 +18,11 @@
             text-align: left;
             border: 1px solid #ddd;
         }
-        .finalizado {
-            background-color: skyblue;
-            color: black;
-            font-weight: normal;
-        }
-        .en-trayecto {
-            background-color: green;
-            color: white;
-            font-weight: bold;
-        }
-        .por-iniciar-10 {
-            background-color: orange;
-            color: black;
-            font-weight: normal;
-        }
-        .por-iniciar-30 {
-            background-color: yellow;
-            color: black;
-            font-weight: normal;
-        }
-        .normal {
-            background-color: '';
-            color: black;
-            font-weight: normal;
-        }
+        .finalizado { background-color: skyblue; }
+        .en-trayecto { background-color: green; color: white; font-weight: bold; }
+        .por-iniciar-10 { background-color: orange; }
+        .por-iniciar-30 { background-color: yellow; }
+        .normal { background-color: ''; }
     </style>
 </head>
 <body>
@@ -60,7 +40,7 @@
     </table>
 
     <script>
-        const sheetUrl = '1wcFN7dBILdmjqxboW5FUcbLnklWHX2p9ZmTrpRjfQ48'; // Reemplaza esto con la URL de tu hoja
+        const sheetUrl = 'https://docs.google.com/spreadsheets/d/1wcFN7dBILdmjqxboW5FUcbLnklWHX2p9ZmTrpRjfQ48/edit?gid=0#gid=0'; // Reemplaza esto con la URL de tu hoja
 
         function fetchData() {
             fetch(sheetUrl)
@@ -73,10 +53,10 @@
 
                     rows.forEach((row, index) => {
                         const cols = row.split(',');
-                        if (cols.length > 2 && index > 0) { // Omitir encabezado
+                        if (cols.length > 2 && index > 0) {
                             const serviceName = cols[0];
-                            const horaInicio = new Date(cols[13]); // Columna N (índice 13)
-                            const horaFin = new Date(cols[14]); // Columna O (índice 14)
+                            const horaInicio = new Date(cols[13]);
+                            const horaFin = new Date(cols[14]);
                             const estadoCelda = document.createElement('td');
                             let estado = '';
 
@@ -110,8 +90,8 @@
                 });
         }
 
-        setInterval(fetchData, 60000); // Actualiza cada minuto
-        fetchData(); // Cargar datos al iniciar
+        setInterval(fetchData, 60000);
+        fetchData();
     </script>
 </body>
 </html>
